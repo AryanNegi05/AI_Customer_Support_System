@@ -9,5 +9,5 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("AI Support System Backend Running");
 });
-
+// this is app.js btw
 module.exports = app;
