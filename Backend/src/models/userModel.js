@@ -33,7 +33,9 @@ const userSchema = new mongoose.Schema(
       enum: ['network_issue', 'billing_issue', 'login_problem', 'payment_issue', 'technical_bug'],
       default: [],
     },
+
   },
+  
   {
     timestamps: true,   // auto adds createdAt and updatedAt
   }
