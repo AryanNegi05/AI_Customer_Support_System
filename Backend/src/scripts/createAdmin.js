@@ -1,5 +1,3 @@
-// backend/src/scripts/createAdmin.js
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel.js');
