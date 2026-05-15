@@ -30,7 +30,7 @@ const data = JSON.parse(
 
   fs.readFileSync(
 
-    "./knowledge-base/faq.json",
+    "./Knowldege-base/faq.json",
 
     "utf-8"
 
