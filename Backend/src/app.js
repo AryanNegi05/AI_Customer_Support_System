@@ -1,17 +1,53 @@
-const express = require("express");
-const cors = require("cors");
-const authRoutes = require("./routes/authRoutes");
-const adminRoutes = require("./routes/adminRoutes");
+import express from "express";
+
+import cors from "cors";
+
+import authRoutes from "./routes/authRoutes.js";
+
+import adminRoutes from "./routes/adminRoutes.js";
+
+import chatRoutes from "./routes/chatRoute.js";
+
+
+
 const app = express();
 
+
+
+// =====================================================
+// MIDDLEWARES
+// =====================================================
+
 app.use(cors());
+
 app.use(express.json());
 
+
+
+// =====================================================
+// ROUTES
+// =====================================================
+
 app.use("/api/v1/auth", authRoutes);
+
 app.use("/api/v1/admin", adminRoutes);
 
+app.use("/api/chat", chatRoutes);
+
+
+
+// =====================================================
+// TEST ROUTE
+// =====================================================
+
 app.get("/", (req, res) => {
-  res.send("AI Support System Backend Running");
+
+  res.send(
+    "AI Support System Backend Running"
+  );
+
 });
-// this is app.js btw
-module.exports = app;
+
+
+
+export default app;

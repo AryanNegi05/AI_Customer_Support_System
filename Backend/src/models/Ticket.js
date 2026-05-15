@@ -1,113 +1,105 @@
 import mongoose from "mongoose";
 
-const TicketSchema = new mongoose.Schema({
 
-  customerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
 
-  conversationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Conversation",
-    required: true
-  },
+const userSchema = new mongoose.Schema(
 
-  assignedAgent: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null
-  },
+  {
 
-  title: {
-    type: String,
-    required: true
-  },
+    name: {
 
-  description: {
-    type: String,
-    required: true
-  },
-
-  category: {
-    type: String,
-    default: null
-  },
-
-  priority: {
-    type: String,
-    enum: [
-      "low",
-      "medium",
-      "high",
-      "critical"
-    ],
-    default: "medium"
-  },
-
-  status: {
-    type: String,
-    enum: [
-      "open",
-      "assigned",
-      "in_progress",
-      "resolved",
-      "closed"
-    ],
-    default: "open"
-  },
-
-  chatbotResolved: {
-    type: Boolean,
-    default: false
-  },
-
-  mlPredictions: {
-
-    predictedCategory: {
       type: String,
-      default: null
+
+      required: true,
+
+      trim: true
+
     },
 
-    predictedPriority: {
+
+
+    email: {
+
       type: String,
-      default: null
+
+      required: true,
+
+      unique: true,
+
+      lowercase: true,
+
+      trim: true
+
     },
 
-    confidenceScore: {
-      type: Number,
-      default: null
+
+
+    password: {
+
+      type: String,
+
+      required: true
+
+    },
+
+
+
+    role: {
+
+      type: String,
+
+      enum: [
+
+        "customer",
+
+        "agent",
+
+        "admin"
+
+      ],
+
+      default: "customer"
+
+    },
+
+
+
+    skills: {
+
+      type: [String],
+
+      enum: [
+
+        "network_issue",
+
+        "billing_issue",
+
+        "login_problem",
+
+        "payment_issue",
+
+        "technical_bug"
+
+      ],
+
+      default: []
+
     }
 
   },
 
-  routingInfo: {
+  {
 
-    routingMethod: {
-      type: String,
-      default: null
-    },
+    timestamps: true
 
-    assignedAt: {
-      type: Date,
-      default: null
-    }
-
-  },
-
-  resolution: {
-    type: String,
-    default: null
-  },
-
-  resolvedAt: {
-    type: Date,
-    default: null
   }
 
-}, {
-  timestamps: true
-});
+);
 
-export default mongoose.model("Ticket", TicketSchema);
+
+
+// IMPORTANT
+export default mongoose.model(
+  "User",
+  userSchema
+);
