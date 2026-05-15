@@ -1,99 +1,252 @@
-const User = require("../models/userModel");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import User from "../models/userModel.js";
+
+import bcrypt from "bcrypt";
+
+import jwt from "jsonwebtoken";
+
+
+
+// =====================================================
+// GENERATE JWT TOKEN
+// =====================================================
 
 const generateToken = (user) => {
+
   return jwt.sign(
+
     {
       id: user._id,
-      role: user.role,
+
+      role: user.role
     },
+
     process.env.JWT_SECRET,
+
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+      expiresIn:
+        process.env.JWT_EXPIRES_IN || "1d"
     }
+
   );
+
 };
 
-exports.register = async (req, res) => {
+
+
+// =====================================================
+// REGISTER
+// =====================================================
+
+export const register = async (
+  req,
+  res
+) => {
+
   try {
-    const { name, email, password } = req.body;
 
-    if (req.body.role && req.body.role !== "customer") {
-      return res.status(403).json({
-        message: "Cannot assign role manually",
-      });
-    }
-
-    // check existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
+    const {
       name,
       email,
-      password: hashedPassword,
-      role: "customer",
-    });
+      password
+    } = req.body;
 
-    const token = generateToken(user);
+
+
+    // prevent manual role assignment
+    if (
+      req.body.role &&
+      req.body.role !== "customer"
+    ) {
+
+      return res.status(403).json({
+
+        message:
+          "Cannot assign role manually"
+
+      });
+
+    }
+
+
+
+    // check existing user
+    const existingUser =
+      await User.findOne({ email });
+
+
+
+    if (existingUser) {
+
+      return res.status(400).json({
+
+        message:
+          "User already exists"
+
+      });
+
+    }
+
+
+
+    // hash password
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
+
+
+
+    // create user
+    const user =
+      await User.create({
+
+        name,
+
+        email,
+
+        password: hashedPassword,
+
+        role: "customer"
+
+      });
+
+
+
+    // generate token
+    const token =
+      generateToken(user);
+
+
 
     return res.status(201).json({
-      message: "User registered successfully",
+
+      message:
+        "User registered successfully",
+
       token,
+
       user: {
+
         id: user._id,
-        role: user.role,
-      },
+
+        role: user.role
+
+      }
+
     });
 
-  } catch (error) {
-    return res.status(500).json({
-      message: "Registration failed",
-      error: error.message,
-    });
   }
+
+  catch (error) {
+
+    return res.status(500).json({
+
+      message:
+        "Registration failed",
+
+      error: error.message
+
+    });
+
+  }
+
 };
 
-exports.login = async (req, res) => {
+
+
+// =====================================================
+// LOGIN
+// =====================================================
+
+export const login = async (
+  req,
+  res
+) => {
+
   try {
-    const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const {
+      email,
+      password
+    } = req.body;
+
+
+
+    // find user
+    const user =
+      await User.findOne({ email });
+
+
+
     if (!user) {
+
       return res.status(404).json({
-        message: "User not found",
+
+        message:
+          "User not found"
+
       });
+
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+
+
+    // compare password
+    const isMatch =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
+
+
     if (!isMatch) {
+
       return res.status(400).json({
-        message: "Invalid credentials",
+
+        message:
+          "Invalid credentials"
+
       });
+
     }
 
-    const token = generateToken(user);
+
+
+    // generate token
+    const token =
+      generateToken(user);
+
+
 
     return res.status(200).json({
-      message: "Login successful",
+
+      message:
+        "Login successful",
+
       token,
+
       user: {
+
         id: user._id,
-        role: user.role,
-      },
+
+        role: user.role
+
+      }
+
     });
 
-  } catch (error) {
-    return res.status(500).json({
-      message: "Login failed",
-      error: error.message,
-    });
   }
+
+  catch (error) {
+
+    return res.status(500).json({
+
+      message:
+        "Login failed",
+
+      error: error.message
+
+    });
+
+  }
+
 };

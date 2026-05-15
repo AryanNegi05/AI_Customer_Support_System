@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Wifi Troubleshooting",
+
+    "category": "network_issue",
+
+    "problem":
+    "Frequent wifi disconnection",
+
+    "keywords": [
+      "wifi",
+      "internet",
+      "router",
+      "disconnect"
+    ],
+
+    "solution":
+    "Please restart your router and update firmware.",
+
+    "tags": [
+      "wifi",
+      "network"
+    ]
+  },
+
+  {
+    "title": "Password Reset",
+
+    "category": "login_issue",
+
+    "problem":
+    "Unable to login account",
+
+    "keywords": [
+      "login",
+      "password",
+      "signin"
+    ],
+
+    "solution":
+    "Please use the forgot password option to reset your password.",
+
+    "tags": [
+      "login",
+      "password"
+    ]
+  },
+
+  {
+    "title": "Payment Failure",
+
+    "category": "payment_issue",
+
+    "problem":
+    "Payment failed but money deducted",
+
+    "keywords": [
+      "payment",
+      "money",
+      "refund",
+      "transaction"
+    ],
+
+    "solution":
+    "Please wait 24 hours for automatic refund processing.",
+
+    "tags": [
+      "payment",
+      "refund"
+    ]
+  }
+]
