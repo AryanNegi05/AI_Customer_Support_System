@@ -6,7 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 
 import adminRoutes from "./routes/adminRoutes.js";
 
-import chatRoutes from "./routes/chatRoute.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 
 
