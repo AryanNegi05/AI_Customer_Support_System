@@ -1,5 +1,11 @@
 import Ticket from "../models/Ticket.js";
 
+import {
+
+  predictTicket
+
+} from "./mlService.js";
+
 
 
 // =====================================================
@@ -23,64 +29,98 @@ export const createTicketService = async ({
   try {
 
     // ===============================================
+    // CALL ML API
+    // ===============================================
+
+    const prediction =
+      await predictTicket(description);
+
+
+
+    // ===============================================
+    // EXTRACT PREDICTIONS
+    // ===============================================
+
+    const predictedCategory =
+      prediction.intent;
+
+    const predictedPriority =
+      prediction.priority;
+
+
+
+    // ===============================================
     // CREATE TICKET
     // ===============================================
 
     const ticket = await Ticket.create({
 
-      customerId,
+  customerId,
 
-      conversationId,
+  conversationId,
 
-      title,
+  title,
 
-      description,
+  description,
 
-      category,
 
-      priority: "medium",
 
-      status: "open",
+  // ===========================================
+  // ML OUTPUTS
+  // ===========================================
 
-      chatbotResolved: false
+  category:
+    predictedCategory || category,
 
-    });
+  priority:
+    predictedPriority || "medium",
+
+
+
+  status: "open",
+
+  chatbotResolved: false,
+
+
+
+  // ===========================================
+  // ML PREDICTIONS
+  // ===========================================
+
+  mlPredictions: {
+
+    predictedCategory,
+
+    predictedPriority,
+
+    confidenceScore: null
+
+  },
+
+
+
+  // ===========================================
+  // FUTURE REDIS/BULLMQ
+  // ===========================================
+
+  routingInfo: {
+
+    routingMethod: null,
+
+    assignedAt: null
+
+  }
+
+});
 
 
 
     // ===============================================
-    // FUTURE ML INTEGRATION
+    // FUTURE:
+    // BULLMQ
     // ===============================================
 
     /*
-    
-    Later:
-    
-    1. Call ML model
-       -> predict category
-       -> predict priority
-    
-    2. Store ML predictions
-    
-    ticket.mlPredictions = {
-       predictedCategory,
-       predictedPriority,
-       confidenceScore
-    };
-    
-    await ticket.save();
-    
-    */
-
-
-
-    // ===============================================
-    // FUTURE BULLMQ INTEGRATION
-    // ===============================================
-
-    /*
-    
-    Later:
     
     await ticketQueue.add(
       "ticket-routing",
@@ -93,22 +133,6 @@ export const createTicketService = async ({
 
 
 
-    // ===============================================
-    // FUTURE REDIS ROUTING
-    // ===============================================
-
-    /*
-    
-    Later worker will:
-    
-    1. Find suitable agents
-    2. Check Redis workloads
-    3. Assign best agent
-    
-    */
-
-
-
     return ticket;
 
   }
@@ -116,6 +140,8 @@ export const createTicketService = async ({
   catch (error) {
 
     console.log(error);
+
+
 
     throw new Error(
       "Ticket creation failed"
