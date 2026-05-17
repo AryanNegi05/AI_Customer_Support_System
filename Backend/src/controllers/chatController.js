@@ -65,20 +65,29 @@ export const chat = async (req, res) => {
         await detectCategory(message);
 
       conversation =
-        await Conversation.create({
+  await Conversation.create({
 
-          customerId,
+    customerId,
 
-          category,
+    category,
 
-          messages: [
-            {
-              sender: "customer",
-              message
-            }
-          ]
+    // IMPORTANT
+    stage: "questions",
 
-        });
+    status: "active",
+
+    currentQuestionIndex: 0,
+
+    messages: [
+
+      {
+        sender: "customer",
+        message
+      }
+
+    ]
+
+});
 
       const firstQuestion =
         await getNextQuestion(
