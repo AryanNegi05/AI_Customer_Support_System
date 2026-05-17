@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import app from "./src/app.js";
 
 import connectDB from "./src/config/db.js";
+import "./src/redis/redisClient.js";
 
-
-
+import "./src/workers/ticketWorker.js";
 dotenv.config();
 
 
