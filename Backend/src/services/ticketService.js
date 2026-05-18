@@ -5,6 +5,8 @@ import {
   predictTicket
 
 } from "./mlService.js";
+import ticketQueue
+from "../queues/ticketQueue.js";
 
 
 
@@ -102,6 +104,7 @@ export const createTicketService = async ({
   // ===========================================
   // FUTURE REDIS/BULLMQ
   // ===========================================
+  
 
   routingInfo: {
 
@@ -112,6 +115,17 @@ export const createTicketService = async ({
   }
 
 });
+await ticketQueue.add(
+
+  "ticket-routing",
+
+  {
+
+    ticketId: ticket._id
+
+  }
+
+);
 
 
 

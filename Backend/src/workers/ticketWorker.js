@@ -3,6 +3,12 @@ import { Worker } from "bullmq";
 import redisConnection
 from "../redis/redisClient.js";
 
+import {
+
+  routeTicket
+
+} from "../services/routingService.js";
+
 
 
 const ticketWorker = new Worker(
@@ -12,23 +18,24 @@ const ticketWorker = new Worker(
   async (job) => {
 
     console.log(
-      "Processing Job..."
+      "Processing Ticket..."
     );
 
 
 
-    console.log(
-      job.data
+    console.log(job.data);
+
+
+
+    // ==========================================
+    // ROUTE TICKET
+    // ==========================================
+
+    await routeTicket(
+
+      job.data.ticketId
+
     );
-
-
-
-    // ==================================
-    // FUTURE:
-    // ML prediction
-    // Redis routing
-    // Agent assignment
-    // ==================================
 
   },
 
