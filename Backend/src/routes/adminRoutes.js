@@ -34,12 +34,8 @@ router.post(
 
 );
 
-router.get(
-
-  "/agents",
-
+router.get("/agents",
   auth,
-
   role("admin"),
 
   getAgents
