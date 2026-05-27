@@ -1,76 +1,89 @@
-import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import Login from './components/auth/Login'
-import Register from './components/auth/Register'
+import Login from './components/Auth/Login'
+import Register from './components/Auth/Register'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './pages/NotFound'
-import ProtectedRoute from './components/common/ProtectedRoutes.jsx'
-import { setUser } from './store/authSlice'
-import * as authService from './services/authService'
-import toast from 'react-hot-toast'
 
-const App = () => {
-  const dispatch = useDispatch()
-  const { isAuthenticated, loading } = useSelector((state) => state.auth)
+// Customer pages
+import CustomerDashboard from './pages/customer/CustomerDashboard'
+import ChatPage from './pages/customer/ChatPage'
+import TicketHistory from './pages/customer/TicketHistory.jsx'
 
-  // Verify token on app mount
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = localStorage.getItem('token')
-      if (token) {
-        try {
-          const response = await authService.verifyToken()
-          dispatch(setUser(response.user))
-        } catch (error) {
-          localStorage.removeItem('token')
-        }
-      }
-    }
+// Agent pages
+import AgentDashboard from './pages/agent/AgentDashboard.jsx'
+import AssignedTickets from './pages/agent/AssignedTickets.jsx'
+import ResolveTicket from './pages/agent/ResolveTicket.jsx'
 
-    verifyToken()
-  }, [dispatch])
+// Admin pages
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import ManageAgents from './pages/admin/ManageAgents.jsx'
+import Analytics from './pages/admin/Analytics.jsx'
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-dark-900 to-dark-800">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 bg-linear-to-r from-primary-500 to-primary-600 rounded-full animate-pulse-slow"></div>
-          <div className="absolute inset-2 bg-dark-800 rounded-full"></div>
-        </div>
-      </div>
-    )
-  }
-
+function App() {
   return (
     <Routes>
-      {/* Auth Routes */}
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
-      />
-      <Route
-        path="/register"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />}
-      />
+      {/* Public */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+      {/* Role redirect */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute><Dashboard /></ProtectedRoute>
+      } />
 
-      {/* Redirect root to dashboard if authenticated, otherwise to login */}
-      <Route
-        path="/"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
-      />
+      {/* Customer routes */}
+      <Route path="/customer/dashboard" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <CustomerDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/chat" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <ChatPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/tickets" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <TicketHistory />
+        </ProtectedRoute>
+      } />
 
-      {/* 404 Page */}
+      {/* Agent routes */}
+      <Route path="/agent/dashboard" element={
+        <ProtectedRoute allowedRoles={['agent']}>
+          <AgentDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/agent/tickets" element={
+        <ProtectedRoute allowedRoles={['agent']}>
+          <AssignedTickets />
+        </ProtectedRoute>
+      } />
+      <Route path="/agent/tickets/:id" element={
+        <ProtectedRoute allowedRoles={['agent']}>
+          <ResolveTicket />
+        </ProtectedRoute>
+      } />
+
+      {/* Admin routes */}
+      <Route path="/admin/dashboard" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/agents" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <ManageAgents />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/analytics" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Analytics />
+        </ProtectedRoute>
+      } />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
