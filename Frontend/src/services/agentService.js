@@ -6,13 +6,16 @@ import apiClient from "../config/api.js"
 // GET ASSIGNED TICKETS
 // =====================================================
 
-export const getAssignedTickets = async () => {
+export const getAssignedTickets =
+  async () => {
 
-  const response = await apiClient.get(
-    "/agent/tickets"
-  )
+    const response =
+      await apiClient.get(
+        "/agent/tickets"
+      )
 
-  return response.data
+    return response.data
+
 }
 
 
@@ -21,13 +24,16 @@ export const getAssignedTickets = async () => {
 // GET SINGLE TICKET
 // =====================================================
 
-export const getSingleTicket = async (ticketId) => {
+export const getSingleTicket =
+  async (ticketId) => {
 
-  const response = await apiClient.get(
-    `/agent/tickets/${ticketId}`
-  )
+    const response =
+      await apiClient.get(
+        `/agent/tickets/${ticketId}`
+      )
 
-  return response.data
+    return response.data
+
 }
 
 
@@ -36,15 +42,25 @@ export const getSingleTicket = async (ticketId) => {
 // UPDATE TICKET STATUS
 // =====================================================
 
-export const updateTicketStatus = async (
-  ticketId,
-  status
-) => {
+export const updateTicketStatus =
+  async (
+    ticketId,
+    status,
+    resolution
+  ) => {
 
-  const response = await apiClient.patch(
-    `/agent/tickets/${ticketId}/status`,
-    { status }
-  )
+    const response =
+      await apiClient.patch(
 
-  return response.data
+        `/agent/tickets/${ticketId}/status`,
+
+        {
+          status,
+          resolution
+        }
+
+      )
+
+    return response.data
+
 }

@@ -1,8 +1,6 @@
-import User from "../models/userModel.js";
-
-import bcrypt from "bcrypt";
-
-import jwt from "jsonwebtoken";
+import User from "../models/userModel.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 
 
@@ -16,7 +14,6 @@ const generateToken = (user) => {
 
     {
       id: user._id,
-
       role: user.role
     },
 
@@ -27,9 +24,9 @@ const generateToken = (user) => {
         process.env.JWT_EXPIRES_IN || "1d"
     }
 
-  );
+  )
 
-};
+}
 
 
 
@@ -48,73 +45,50 @@ export const register = async (
       name,
       email,
       password
-    } = req.body;
+    } = req.body
 
-
-
-    // prevent manual role assignment
     if (
       req.body.role &&
       req.body.role !== "customer"
     ) {
 
       return res.status(403).json({
-
         message:
           "Cannot assign role manually"
-
-      });
+      })
 
     }
 
-
-
-    // check existing user
     const existingUser =
-      await User.findOne({ email });
-
-
+      await User.findOne({ email })
 
     if (existingUser) {
 
       return res.status(400).json({
-
         message:
           "User already exists"
-
-      });
+      })
 
     }
 
-
-
-    // hash password
     const hashedPassword =
-      await bcrypt.hash(password, 10);
+      await bcrypt.hash(password, 10)
 
-
-
-    // create user
     const user =
       await User.create({
 
         name,
-
         email,
 
-        password: hashedPassword,
+        password:
+          hashedPassword,
 
         role: "customer"
 
-      });
+      })
 
-
-
-    // generate token
     const token =
-      generateToken(user);
-
-
+      generateToken(user)
 
     return res.status(201).json({
 
@@ -125,13 +99,17 @@ export const register = async (
 
       user: {
 
-        id: user._id,
+        _id: user._id,
+
+        name: user.name,
+
+        email: user.email,
 
         role: user.role
 
       }
 
-    });
+    })
 
   }
 
@@ -144,11 +122,11 @@ export const register = async (
 
       error: error.message
 
-    });
+    })
 
   }
 
-};
+}
 
 
 
@@ -166,15 +144,10 @@ export const login = async (
     const {
       email,
       password
-    } = req.body;
+    } = req.body
 
-
-
-    // find user
     const user =
-      await User.findOne({ email });
-
-
+      await User.findOne({ email })
 
     if (!user) {
 
@@ -183,20 +156,15 @@ export const login = async (
         message:
           "User not found"
 
-      });
+      })
 
     }
 
-
-
-    // compare password
     const isMatch =
       await bcrypt.compare(
         password,
         user.password
-      );
-
-
+      )
 
     if (!isMatch) {
 
@@ -205,17 +173,12 @@ export const login = async (
         message:
           "Invalid credentials"
 
-      });
+      })
 
     }
 
-
-
-    // generate token
     const token =
-      generateToken(user);
-
-
+      generateToken(user)
 
     return res.status(200).json({
 
@@ -226,13 +189,17 @@ export const login = async (
 
       user: {
 
-        id: user._id,
+        _id: user._id,
+
+        name: user.name,
+
+        email: user.email,
 
         role: user.role
 
       }
 
-    });
+    })
 
   }
 
@@ -245,8 +212,51 @@ export const login = async (
 
       error: error.message
 
-    });
+    })
 
   }
 
-};
+}
+
+
+
+// =====================================================
+// GET CURRENT USER
+// =====================================================
+
+export const getMe = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const user =
+      await User.findById(
+        req.user.id
+      ).select("-password")
+
+    res.status(200).json({
+
+      success: true,
+
+      user
+
+    })
+
+  }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to fetch user"
+
+    })
+
+  }
+
+}

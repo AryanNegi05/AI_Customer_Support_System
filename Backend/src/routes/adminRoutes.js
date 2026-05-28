@@ -1,25 +1,31 @@
-import express from "express";
+import express from "express"
 
 import {
 
   createAgent,
 
-  getAgents
+  getAgents,
 
-} from "../controllers/adminController.js";
+  getAllTickets,
 
-import auth from "../middlewares/authMiddleware.js";
+  getAnalytics
 
-import role from "../middlewares/roleMiddleware.js";
+} from "../controllers/adminController.js"
+
+import auth
+from "../middlewares/authMiddleware.js"
+
+import role
+from "../middlewares/roleMiddleware.js"
 
 
 
-const router = express.Router();
+const router = express.Router()
 
 
 
 // =====================================================
-// ADMIN ROUTES
+// CREATE AGENT
 // =====================================================
 
 router.post(
@@ -32,16 +38,62 @@ router.post(
 
   createAgent
 
-);
+)
 
-router.get("/agents",
+
+
+// =====================================================
+// GET ALL AGENTS
+// =====================================================
+
+router.get(
+
+  "/agents",
+
   auth,
+
   role("admin"),
 
   getAgents
 
-);
+)
 
 
 
-export default router;
+// =====================================================
+// GET ALL TICKETS
+// =====================================================
+
+router.get(
+
+  "/tickets",
+
+  auth,
+
+  role("admin"),
+
+  getAllTickets
+
+)
+
+
+
+// =====================================================
+// GET ANALYTICS
+// =====================================================
+
+router.get(
+
+  "/analytics",
+
+  auth,
+
+  role("admin"),
+
+  getAnalytics
+
+)
+
+
+
+export default router
