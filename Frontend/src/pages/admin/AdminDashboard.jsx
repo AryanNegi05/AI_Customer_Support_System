@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logoutUser } from '../../store/authSlice'
-
+import { useEffect } from 'react'
+import {fetchAnalytics, fetchAgents} from '../../store/adminSlice'
 const AdminDashboard = () => {
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
@@ -12,19 +13,54 @@ const AdminDashboard = () => {
     navigate('/login')
   }
 
-  const stats = [
-    { label: 'Total Tickets', value: '248', color: 'from-cyan-500 to-blue-600' },
-    { label: 'Active Agents', value: '8', color: 'from-emerald-500 to-teal-600' },
-    { label: 'Avg Resolution', value: '3.2h', color: 'from-violet-500 to-purple-600' },
-    { label: 'AI Resolved', value: '61%', color: 'from-amber-500 to-orange-600' },
-  ]
+  const { analytics, agents } =
+  useSelector(
+    state => state.admin
+  )
 
-  const agents = [
-    { name: 'Priya Mehta', tickets: 7, resolved: 42, online: true },
-    { name: 'Rahul Sharma', tickets: 5, resolved: 38, online: true },
-    { name: 'Amit Singh', tickets: 9, resolved: 55, online: false },
-    { name: 'Neha Gupta', tickets: 3, resolved: 29, online: true },
-  ]
+useEffect(() => {
+
+  dispatch(fetchAnalytics())
+
+  dispatch(fetchAgents())
+
+}, [dispatch])
+
+const stats = [
+
+  {
+    label: 'Total Tickets',
+    value:
+      analytics?.totalTickets || 0,
+    color:
+      'from-cyan-500 to-blue-600'
+  },
+
+  {
+    label: 'Active Agents',
+    value:
+      analytics?.totalAgents || 0,
+    color:
+      'from-emerald-500 to-teal-600'
+  },
+
+  {
+    label: 'Resolved',
+    value:
+      analytics?.resolvedTickets || 0,
+    color:
+      'from-violet-500 to-purple-600'
+  },
+
+  {
+    label: 'Open Tickets',
+    value:
+      analytics?.openTickets || 0,
+    color:
+      'from-amber-500 to-orange-600'
+  }
+
+]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">

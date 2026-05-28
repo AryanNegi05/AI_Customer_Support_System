@@ -3,7 +3,8 @@ import {
   createAsyncThunk
 } from "@reduxjs/toolkit"
 
-import * as agentService from "../services/agentService"
+import * as agentService
+from "../services/agentService"
 
 
 
@@ -12,16 +13,21 @@ import * as agentService from "../services/agentService"
 // =====================================================
 
 const initialState = {
+
   tickets: [],
+
   selectedTicket: null,
+
   loading: false,
+
   error: null
+
 }
 
 
 
 // =====================================================
-// GET ASSIGNED TICKETS
+// FETCH ASSIGNED TICKETS
 // =====================================================
 
 export const fetchAssignedTickets =
@@ -33,12 +39,17 @@ export const fetchAssignedTickets =
 
       try {
 
-        return await agentService.getAssignedTickets()
+        return await agentService
+          .getAssignedTickets()
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         return thunkAPI.rejectWithValue(
+
           error.response?.data?.message
+
         )
 
       }
@@ -50,7 +61,7 @@ export const fetchAssignedTickets =
 
 
 // =====================================================
-// GET SINGLE TICKET
+// FETCH SINGLE TICKET
 // =====================================================
 
 export const fetchSingleTicket =
@@ -62,14 +73,17 @@ export const fetchSingleTicket =
 
       try {
 
-        return await agentService.getSingleTicket(
-          ticketId
-        )
+        return await agentService
+          .getSingleTicket(ticketId)
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         return thunkAPI.rejectWithValue(
+
           error.response?.data?.message
+
         )
 
       }
@@ -81,7 +95,7 @@ export const fetchSingleTicket =
 
 
 // =====================================================
-// UPDATE TICKET STATUS
+// UPDATE STATUS
 // =====================================================
 
 export const changeTicketStatus =
@@ -89,19 +103,37 @@ export const changeTicketStatus =
 
     "agent/changeStatus",
 
-    async ({ ticketId, status }, thunkAPI) => {
+    async (
+
+      {
+        ticketId,
+        status,
+        resolution
+      },
+
+      thunkAPI
+
+    ) => {
 
       try {
 
-        return await agentService.updateTicketStatus(
-          ticketId,
-          status
-        )
+        return await agentService
+          .updateTicketStatus(
 
-      } catch (error) {
+            ticketId,
+            status,
+            resolution
+
+          )
+
+      }
+
+      catch (error) {
 
         return thunkAPI.rejectWithValue(
+
           error.response?.data?.message
+
         )
 
       }
@@ -111,10 +143,6 @@ export const changeTicketStatus =
   )
 
 
-
-// =====================================================
-// SLICE
-// =====================================================
 
 const agentSlice = createSlice({
 
@@ -126,9 +154,12 @@ const agentSlice = createSlice({
 
   extraReducers: (builder) => {
 
+    // =================================================
+    // FETCH TICKETS
+    // =================================================
+
     builder
 
-      // FETCH TICKETS
       .addCase(
         fetchAssignedTickets.pending,
         (state) => {
@@ -156,33 +187,104 @@ const agentSlice = createSlice({
 
           state.loading = false
 
-          state.error = action.payload
+          state.error =
+            action.payload
 
         }
       )
 
 
 
-      // SINGLE TICKET
+    // =================================================
+    // FETCH SINGLE
+    // =================================================
+
+    builder
+
+      .addCase(
+        fetchSingleTicket.pending,
+        (state) => {
+
+          state.loading = true
+
+        }
+      )
+
       .addCase(
         fetchSingleTicket.fulfilled,
         (state, action) => {
 
+          state.loading = false
+
           state.selectedTicket =
             action.payload.ticket
 
         }
       )
 
+      .addCase(
+        fetchSingleTicket.rejected,
+        (state, action) => {
+
+          state.loading = false
+
+          state.error =
+            action.payload
+
+        }
+      )
 
 
-      // UPDATE STATUS
+
+    // =================================================
+    // UPDATE STATUS
+    // =================================================
+
+    builder
+
+      .addCase(
+        changeTicketStatus.pending,
+        (state) => {
+
+          state.loading = true
+
+        }
+      )
+
       .addCase(
         changeTicketStatus.fulfilled,
         (state, action) => {
 
+          state.loading = false
+
           state.selectedTicket =
             action.payload.ticket
+
+
+
+          state.tickets =
+            state.tickets.map((ticket) =>
+
+              ticket._id ===
+              action.payload.ticket._id
+
+                ? action.payload.ticket
+
+                : ticket
+
+            )
+
+        }
+      )
+
+      .addCase(
+        changeTicketStatus.rejected,
+        (state, action) => {
+
+          state.loading = false
+
+          state.error =
+            action.payload
 
         }
       )

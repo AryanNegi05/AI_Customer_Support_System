@@ -9,7 +9,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js"
 
-
+import customerRoutes
+from "./routes/customerRoutes.js"
 
 const app = express();
 
@@ -33,10 +34,13 @@ app.use("/api/v1/auth", authRoutes);
 
 app.use("/api/v1/admin", adminRoutes);
 
-app.use("/api/chat", chatRoutes);
+app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/agent" ,agentRoutes );
 
-
+app.use(
+  "/api/v1/customer",
+  customerRoutes
+)
 
 // =====================================================
 // TEST ROUTE
