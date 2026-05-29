@@ -1,22 +1,22 @@
-import express from "express"
+// import express from "express"
 
-import {
-  chat
-}
-from "../controllers/langchainController.js"
-
-
-
-const router =
-  express.Router()
+// import {
+//   chat
+// }
+// from "../controllers/chatController.js"
 
 
 
-router.post(
-  "/chat",
-  chat
-)
+// const router =
+//   express.Router()
 
 
 
-export default router
+// router.post(
+//   "/chat",
+//   chat
+// )
+
+
+
+// export default router
