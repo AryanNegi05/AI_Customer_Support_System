@@ -24,9 +24,7 @@ export const sendChatMessage =
     'chat/sendMessage',
 
     async (data, thunkAPI) => {
-
       try {
-
         return await chatService
           .sendMessage(data)
 
