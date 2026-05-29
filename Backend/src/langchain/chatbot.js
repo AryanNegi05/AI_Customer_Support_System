@@ -2,16 +2,35 @@ import { ChatGroq }
 from "@langchain/groq"
 
 import {
-  ChatPromptTemplate,
-  MessagesPlaceholder
+  createReactAgent
 }
-from "@langchain/core/prompts"
+from "@langchain/langgraph/prebuilt"
+
+import {
+  MemorySaver
+}
+from "@langchain/langgraph"
 
 import {
   HumanMessage,
-  AIMessage
+  SystemMessage
 }
 from "@langchain/core/messages"
+
+import {
+  searchKnowledgeTool
+}
+from "./tools/searchKnowledgeTool.js"
+
+import {
+  createTicketTool
+}
+from "./tools/createTicketTool.js"
+
+import {
+  summaryTool
+}
+from "./tools/summaryTool.js"
 
 
 
@@ -19,18 +38,17 @@ from "@langchain/core/messages"
 // LLM
 // =====================================================
 
-const llm =
-  new ChatGroq({
+const llm = new ChatGroq({
 
-    apiKey:
-      process.env.GROQ_API_KEY,
+  apiKey:
+    process.env.GROQ_API_KEY,
 
-    model:
-      "llama-3.3-70b-versatile",
+  model:
+    "llama-3.3-70b-versatile",
 
-    temperature: 0.3
+  temperature: 0.2
 
-  })
+})
 
 
 
@@ -38,96 +56,136 @@ const llm =
 // MEMORY
 // =====================================================
 
-const chatHistory = []
+const memory =
+  new MemorySaver()
 
 
 
 // =====================================================
-// PROMPT
+// TOOLS
 // =====================================================
 
-const prompt =
-  ChatPromptTemplate.fromMessages([
+const tools = [
 
-   [
-  "system",
-  `
-You are an AI Customer Support Assistant.
+  searchKnowledgeTool,
 
-Your responsibilities:
+  createTicketTool,
 
-1. Help customers troubleshoot issues.
-2. Ask follow-up questions when needed.
-3. Be professional and concise.
-4. Never invent information.
-5. If an issue cannot be resolved easily, recommend creating a support ticket.
-6. Explain solutions step-by-step.
-7. Focus only on customer support tasks.
-8. Do not act like a general chatbot.
-`
-],
-    new MessagesPlaceholder(
-      "history"
-    ),
+  summaryTool
 
-    [
-      "human",
-
-      "{input}"
-    ]
-
-  ])
+]
 
 
 
 // =====================================================
-// CHAT
+// AGENT
 // =====================================================
 
-export const askBot =
-  async (message) => {
+export const agent =
+createReactAgent({
 
-    const formattedPrompt =
+  llm,
 
-      await prompt.formatMessages({
+  tools,
 
-        history:
-          chatHistory,
+  checkpointSaver:
+    memory
 
-        input:
-          message
-
-      })
+})
 
 
+
+// =====================================================
+// ASK SUPPORT BOT
+// =====================================================
+
+export const askSupportBot =
+async ({
+
+  message,
+
+  customerId,
+
+  conversationId
+
+}) => {
+
+  try {
 
     const response =
-      await llm.invoke(
-        formattedPrompt
+      await agent.invoke(
+
+        {
+
+          messages: [
+
+            new SystemMessage(`
+
+You are an AI customer support assistant.
+
+IMPORTANT RULES:
+
+1. Always help the customer first.
+
+2. Use knowledge base tool before escalation.
+
+3. If issue is unresolved,
+create a support ticket.
+
+4. ALWAYS use THESE EXACT IDs:
+
+customerId = ${customerId}
+
+conversationId = ${conversationId}
+
+5. NEVER generate fake IDs.
+
+6. Before ticket creation:
+   - generate summary
+   - then create ticket
+
+7. Use concise responses.
+
+`),
+
+            new HumanMessage(message)
+
+          ]
+
+        },
+
+        {
+
+          configurable: {
+
+            thread_id:
+              conversationId
+
+          }
+
+        }
+
       )
 
 
 
-    chatHistory.push(
-
-      new HumanMessage(
-        message
-      )
-
-    )
-
-
-
-    chatHistory.push(
-
-      new AIMessage(
-        response.content
-      )
-
-    )
-
-
-
-    return response.content
+    return response.messages[
+      response.messages.length - 1
+    ].content
 
   }
+
+  catch (error) {
+
+    console.log(
+      "LangChain Error:",
+      error
+    )
+
+
+
+    return "Something went wrong."
+
+  }
+
+}

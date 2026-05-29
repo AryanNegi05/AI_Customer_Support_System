@@ -11,8 +11,7 @@ import agentRoutes from "./routes/agentRoutes.js"
 
 import customerRoutes
 from "./routes/customerRoutes.js"
-import langchainRoutes
-from "./routes/langchainRoutes.js"
+
 const app = express();
 
 
@@ -37,7 +36,7 @@ app.use("/api/v1/admin", adminRoutes);
 
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/agent" ,agentRoutes );
-app.use("/api/v1/langchain", langchainRoutes);
+
 app.use(
   "/api/v1/customer",
   customerRoutes

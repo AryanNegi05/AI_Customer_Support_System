@@ -1,28 +1,28 @@
-import {askBot}
-from "../langchain/chatbot.js"
-export const chat = async (req, res) => {
+// import {askSupportBot}
+// from "../langchain/chatbot.js"
+// export const chat = async (req, res) => {
 
-  try {
-    console.log("REQUEST RECEIVED")
-    const { message } = req.body
-    console.log("MESSAGE =", message)
+//   try {
+//     console.log("REQUEST RECEIVED")
+//     const { message } = req.body
+//     console.log("MESSAGE =", message)
 
-    const reply = await askBot(message)
+//     const reply = await askSupportBot(message)
 
-    console.log("REPLY RECEIVED")
+//     console.log("REPLY RECEIVED")
 
-    res.json({
-      success: true,
-      reply
-    })
+//     res.json({
+//       success: true,
+//       reply
+//     })
 
-  } catch (error) {
+//   } catch (error) {
 
-    console.log("CONTROLLER ERROR")
-    console.log(error)
+//     console.log("CONTROLLER ERROR")
+//     console.log(error)
 
-    res.status(500).json({
-      success: false
-    })
-  }
-}
+//     res.status(500).json({
+//       success: false
+//     })
+//   }
+// }
