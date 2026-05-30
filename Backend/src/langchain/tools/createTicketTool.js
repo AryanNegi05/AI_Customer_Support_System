@@ -9,82 +9,81 @@ import {
 }
 from "../../services/ticketService.js"
 
-
-
 export const createTicketTool =
 tool(
 
   async ({
+
     customerId,
+
     conversationId,
+
     title,
+
     description,
+
     category
+
   }) => {
 
-    try {
+    const ticket =
+      await createTicketService({
 
-      const ticket =
-        await createTicketService({
+        customerId,
 
-          customerId,
+        conversationId,
 
-          conversationId,
+        title,
 
-          title,
+        description,
 
-          description,
+        category
 
-          category
-
-        })
+      })
 
 
 
-      return `
-Ticket created successfully.
+    return `
+
+Ticket Created.
 
 Ticket ID:
 ${ticket._id}
+
+Status:
+${ticket.status}
+
 `
-
-    }
-
-    catch (error) {
-
-      console.log(error)
-
-      return "Failed to create ticket."
-
-    }
 
   },
 
   {
 
-    name: "create_ticket",
+    name:
+      "create_ticket",
 
     description:
-      `Create support ticket.`,
+      "Create support ticket.",
 
-    schema: z.object({
+    schema:
+      z.object({
 
-      customerId:
-        z.string(),
+        customerId:
+          z.string(),
 
-      conversationId:
-        z.string(),
+        conversationId:
+          z.string(),
 
-      title:
-        z.string(),
+        title:
+          z.string(),
 
-      description:
-        z.string(),
+        description:
+          z.string(),
 
-      category:
-        z.string()
+        category:
+          z.string()
 
-    })
+      })
 
   }
 

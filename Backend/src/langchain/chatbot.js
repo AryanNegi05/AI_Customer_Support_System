@@ -12,8 +12,13 @@ import {
 from "@langchain/langgraph"
 
 import {
+
   HumanMessage,
+
+  AIMessage,
+
   SystemMessage
+
 }
 from "@langchain/core/messages"
 
@@ -32,13 +37,19 @@ import {
 }
 from "./tools/summaryTool.js"
 
+import {
+  ticketStatusTool
+}
+from "./tools/ticketStatusTool.js"
+
 
 
 // =====================================================
 // LLM
 // =====================================================
 
-const llm = new ChatGroq({
+const llm =
+new ChatGroq({
 
   apiKey:
     process.env.GROQ_API_KEY,
@@ -57,7 +68,7 @@ const llm = new ChatGroq({
 // =====================================================
 
 const memory =
-  new MemorySaver()
+new MemorySaver()
 
 
 
@@ -71,7 +82,9 @@ const tools = [
 
   createTicketTool,
 
-  summaryTool
+  summaryTool,
+
+  ticketStatusTool
 
 ]
 
@@ -104,15 +117,65 @@ async ({
 
   message,
 
+  history,
+
   customerId,
 
-  conversationId
+  conversationId,
+
+  canEscalate
 
 }) => {
 
   try {
 
+    const langchainHistory = []
+
+
+
+    for (const msg of history) {
+
+      if (
+
+        msg.sender ===
+        "customer"
+
+      ) {
+
+        langchainHistory.push(
+
+          new HumanMessage(
+            msg.message
+          )
+
+        )
+
+      }
+
+      else if (
+
+        msg.sender === "bot" ||
+
+        msg.sender === "agent"
+
+      ) {
+
+        langchainHistory.push(
+
+          new AIMessage(
+            msg.message
+          )
+
+        )
+
+      }
+
+    }
+
+
+
     const response =
+
       await agent.invoke(
 
         {
@@ -121,34 +184,59 @@ async ({
 
             new SystemMessage(`
 
-You are an AI customer support assistant.
+You are an AI Customer Support Assistant.
 
-IMPORTANT RULES:
+Responsibilities:
 
-1. Always help the customer first.
+1. Troubleshoot customer issues.
+2. Ask follow-up questions.
+3. Suggest solutions.
+4. Use knowledge base when useful.
+5. Be concise and professional.
 
-2. Use knowledge base tool before escalation.
-
-3. If issue is unresolved,
-create a support ticket.
-
-4. ALWAYS use THESE EXACT IDs:
+IMPORTANT:
 
 customerId = ${customerId}
 
 conversationId = ${conversationId}
 
-5. NEVER generate fake IDs.
+canEscalate = ${canEscalate}
 
-6. Before ticket creation:
-   - generate summary
-   - then create ticket
+One conversation can have ONLY ONE ticket.
 
-7. Use concise responses.
+If ticket already exists:
+
+- use ticket_status tool
+- never create duplicate tickets
+
+If canEscalate = false:
+
+- do NOT create ticket
+- continue troubleshooting
+
+If canEscalate = true:
+
+- you may create ticket
+- first generate summary
+- then create ticket
+
+Critical examples:
+
+- payment deducted
+- account hacked
+- security issue
+- service outage
+- server down
+
+Always help customer first.
 
 `),
 
-            new HumanMessage(message)
+            ...langchainHistory,
+
+            new HumanMessage(
+              message
+            )
 
           ]
 
@@ -178,8 +266,11 @@ conversationId = ${conversationId}
   catch (error) {
 
     console.log(
+
       "LangChain Error:",
+
       error
+
     )
 
 

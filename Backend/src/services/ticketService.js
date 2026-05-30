@@ -1,20 +1,15 @@
-import Ticket from "../models/Ticket.js";
+import Ticket from "../models/Ticket.js"
+import Conversation from "../models/Conversation.js"
 
 import {
-
   predictTicket
+} from "./mlService.js"
 
-} from "./mlService.js";
 import ticketQueue
-from "../queues/ticketQueue.js";
+from "../queues/ticketQueue.js"
 
-
-
-// =====================================================
-// CREATE TICKET SERVICE
-// =====================================================
-
-export const createTicketService = async ({
+export const createTicketService =
+async ({
 
   customerId,
 
@@ -30,137 +25,108 @@ export const createTicketService = async ({
 
   try {
 
-    // ===============================================
-    // CALL ML API
-    // ===============================================
+    const existing =
+      await Ticket.findOne({
+
+        conversationId
+
+      })
+
+    if (existing) {
+
+      return existing
+
+    }
 
     const prediction =
-      await predictTicket(description);
+      await predictTicket(
+        description
+      )
+
+    const ticket =
+      await Ticket.create({
+
+        customerId,
+
+        conversationId,
+
+        title,
+
+        description,
+
+        category:
+          prediction.intent ||
+          category,
+
+        priority:
+          prediction.priority ||
+          "medium",
+
+        status:
+          "open",
+
+        chatbotResolved:
+          false,
+
+        mlPredictions: {
+
+          predictedCategory:
+            prediction.intent,
+
+          predictedPriority:
+            prediction.priority
+
+        }
+
+      })
 
 
 
-    // ===============================================
-    // EXTRACT PREDICTIONS
-    // ===============================================
+    await Conversation.findByIdAndUpdate(
 
-    const predictedCategory =
-      prediction.intent;
+      conversationId,
 
-    const predictedPriority =
-      prediction.priority;
-
-
-
-    // ===============================================
-    // CREATE TICKET
-    // ===============================================
-
-    const ticket = await Ticket.create({
-
-  customerId,
-
-  conversationId,
-
-  title,
-
-  description,
-
-
-
-  // ===========================================
-  // ML OUTPUTS
-  // ===========================================
-
-  category:
-    predictedCategory || category,
-
-  priority:
-    predictedPriority || "medium",
-
-
-
-  status: "open",
-
-  chatbotResolved: false,
-
-
-
-  // ===========================================
-  // ML PREDICTIONS
-  // ===========================================
-
-  mlPredictions: {
-
-    predictedCategory,
-
-    predictedPriority,
-
-    confidenceScore: null
-
-  },
-
-
-
-  // ===========================================
-  // FUTURE REDIS/BULLMQ
-  // ===========================================
-  
-
-  routingInfo: {
-
-    routingMethod: null,
-
-    assignedAt: null
-
-  }
-
-});
-await ticketQueue.add(
-
-  "ticket-routing",
-
-  {
-
-    ticketId: ticket._id
-
-  }
-
-);
-
-
-
-    // ===============================================
-    // FUTURE:
-    // BULLMQ
-    // ===============================================
-
-    /*
-    
-    await ticketQueue.add(
-      "ticket-routing",
       {
-        ticketId: ticket._id
+
+        ticketId:
+          ticket._id,
+
+        status:
+          "ticket_created"
+
       }
-    );
-    
-    */
+
+    )
 
 
 
-    return ticket;
+    await ticketQueue.add(
+
+      "ticket-routing",
+
+      {
+
+        ticketId:
+          ticket._id
+
+      }
+
+    )
+
+
+
+    return ticket
 
   }
 
   catch (error) {
 
-    console.log(error);
-
-
+    console.log(error)
 
     throw new Error(
       "Ticket creation failed"
-    );
+    )
 
   }
 
-};
+}

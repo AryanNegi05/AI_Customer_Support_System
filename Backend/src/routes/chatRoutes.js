@@ -1,11 +1,23 @@
-import express from "express";
+import express from "express"
 
-import {
+import { chat }
+from "../controllers/chatController.js"
+
+import authMiddleware
+from "../middlewares/authMiddleware.js"
+
+import roleMiddleware
+from "../middlewares/roleMiddleware.js"
+
+const router = express.Router()
+
+
+
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware("customer"),
   chat
-} from "../controllers/chatController.js";
+)
 
-const router = express.Router();
-
-router.post("/", chat);
-
-export default router;
+export default router

@@ -1,72 +1,73 @@
 [
   {
-    "title": "Wifi Troubleshooting",
-
-    "category": "network_issue",
-
-    "problem":
-    "Frequent wifi disconnection",
-
-    "keywords": [
-      "wifi",
-      "internet",
-      "router",
-      "disconnect"
-    ],
-
-    "solution":
-    "Please restart your router and update firmware.",
-
-    "tags": [
-      "wifi",
-      "network"
-    ]
+    "title":"Wifi Troubleshooting",
+    "category":"network_issue",
+    "problem":"Frequent wifi disconnection",
+    "keywords":["wifi","internet","router","disconnect"],
+    "solution":"Restart router and update firmware."
   },
 
   {
-    "title": "Password Reset",
-
-    "category": "login_issue",
-
-    "problem":
-    "Unable to login account",
-
-    "keywords": [
-      "login",
-      "password",
-      "signin"
-    ],
-
-    "solution":
-    "Please use the forgot password option to reset your password.",
-
-    "tags": [
-      "login",
-      "password"
-    ]
+    "title":"Internet Slow",
+    "category":"network_issue",
+    "problem":"Slow internet speed",
+    "keywords":["slow","internet","speed","network"],
+    "solution":"Restart router and disconnect unused devices."
   },
 
   {
-    "title": "Payment Failure",
+    "title":"Router Not Turning On",
+    "category":"network_issue",
+    "problem":"Router power issue",
+    "keywords":["router","power","not working"],
+    "solution":"Check power cable and adapter."
+  },
 
-    "category": "payment_issue",
+  {
+    "title":"Password Reset",
+    "category":"login_issue",
+    "problem":"Unable to login",
+    "keywords":["login","password","signin"],
+    "solution":"Use forgot password option."
+  },
 
-    "problem":
-    "Payment failed but money deducted",
+  {
+    "title":"OTP Not Received",
+    "category":"login_issue",
+    "problem":"OTP not arriving",
+    "keywords":["otp","verification","code"],
+    "solution":"Wait 2 minutes and check spam folder."
+  },
 
-    "keywords": [
-      "payment",
-      "money",
-      "refund",
-      "transaction"
-    ],
+  {
+    "title":"Account Locked",
+    "category":"login_issue",
+    "problem":"Too many failed login attempts",
+    "keywords":["locked","account","login"],
+    "solution":"Wait 30 minutes and try again."
+  },
 
-    "solution":
-    "Please wait 24 hours for automatic refund processing.",
+  {
+    "title":"Payment Failure",
+    "category":"payment_issue",
+    "problem":"Payment failed",
+    "keywords":["payment","transaction","money"],
+    "solution":"Retry after checking payment details."
+  },
 
-    "tags": [
-      "payment",
-      "refund"
-    ]
+  {
+    "title":"Refund Pending",
+    "category":"payment_issue",
+    "problem":"Refund not received",
+    "keywords":["refund","money","return"],
+    "solution":"Refunds take 3-5 business days."
+  },
+
+  {
+    "title":"Double Charge",
+    "category":"payment_issue",
+    "problem":"Charged twice",
+    "keywords":["charged","twice","duplicate"],
+    "solution":"Contact support if amount isn't reversed in 24 hours."
   }
 ]
