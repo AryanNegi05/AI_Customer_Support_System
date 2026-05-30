@@ -36,7 +36,12 @@ app.use("/api/v1/admin", adminRoutes);
 
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/agent" ,agentRoutes );
-
+import conversationRoutes
+from "./routes/conversationRoutes.js"
+app.use(
+  "/api/v1/conversation",
+  conversationRoutes
+)
 app.use(
   "/api/v1/customer",
   customerRoutes

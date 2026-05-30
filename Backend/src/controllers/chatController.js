@@ -4,10 +4,19 @@ import {
   askSupportBot
 } from "../langchain/chatbot.js"
 
+import {
+
+  increaseFailedAttempts,
+
+  shouldEscalate
+
+}
+from "../services/escalationService.js"
+
 
 
 // =====================================================
-// CHAT CONTROLLER
+// CHAT
 // =====================================================
 
 export const chat = async (req, res) => {
@@ -15,24 +24,29 @@ export const chat = async (req, res) => {
   try {
 
     const {
-      customerId,
+
+      conversationId,
+
       message
+
     } = req.body
 
 
 
-    // ===============================================
-    // VALIDATION
-    // ===============================================
+    if (
 
-    if (!customerId || !message) {
+      !conversationId ||
+
+      !message
+
+    ) {
 
       return res.status(400).json({
 
         success: false,
 
         message:
-          "customerId and message required"
+          "conversationId and message required"
 
       })
 
@@ -40,49 +54,148 @@ export const chat = async (req, res) => {
 
 
 
-    // ===============================================
-    // FIND ACTIVE CONVERSATION
-    // ===============================================
-
-    let conversation =
+    const conversation =
       await Conversation.findOne({
 
-        customerId,
+        _id:
+          conversationId,
 
-        status: "active"
+        customerId:
+          req.user.id
 
       })
 
 
-
-    // ===============================================
-    // CREATE NEW CONVERSATION
-    // ===============================================
 
     if (!conversation) {
 
-      conversation =
-        await Conversation.create({
+      return res.status(404).json({
 
-          customerId,
+        success: false,
 
-          status: "active",
+        message:
+          "Conversation not found"
 
-          messages: []
-
-        })
+      })
 
     }
 
 
 
-    // ===============================================
+    // =================================================
+    // AUTO TITLE
+    // =================================================
+
+    if (
+
+      conversation.title ===
+      "New Chat"
+
+    ) {
+
+      conversation.title =
+        message.substring(0, 40)
+
+    }
+
+
+
+    // =================================================
+    // FAILURE DETECTION
+    // =================================================
+
+    const failureWords = [
+
+      "still not working",
+
+      "didn't work",
+
+      "not resolved",
+
+      "same issue",
+
+      "problem persists",
+
+      "still facing",
+
+      "not fixed"
+
+    ]
+
+
+
+    const isFailureMessage =
+
+      failureWords.some(
+
+        word =>
+
+          message
+            .toLowerCase()
+            .includes(word)
+
+      )
+
+
+
+    if (isFailureMessage) {
+
+      await increaseFailedAttempts(
+
+        conversation
+
+      )
+
+    }
+
+
+
+    // =================================================
+    // ESCALATION CHECK
+    // =================================================
+
+    const escalation =
+
+      shouldEscalate(
+
+        conversation,
+
+        message
+
+      )
+
+
+
+    // =================================================
+    // HISTORY
+    // =================================================
+
+    const history =
+
+      conversation.messages.map(
+
+        msg => ({
+
+          sender:
+            msg.sender,
+
+          message:
+            msg.message
+
+        })
+
+      )
+
+
+
+    // =================================================
     // SAVE CUSTOMER MESSAGE
-    // ===============================================
+    // =================================================
 
     conversation.messages.push({
 
-      sender: "customer",
+      sender:
+        "customer",
 
       message
 
@@ -94,34 +207,42 @@ export const chat = async (req, res) => {
 
 
 
-    // ===============================================
-    // CALL LANGCHAIN AGENT
-    // ===============================================
+    // =================================================
+    // LANGCHAIN
+    // =================================================
 
     const botReply =
+
       await askSupportBot({
 
         message,
 
+        history,
+
         customerId:
-          conversation.customerId.toString(),
+          req.user.id.toString(),
 
         conversationId:
-          conversation._id.toString()
+          conversation._id.toString(),
+
+        canEscalate:
+          escalation.escalate
 
       })
 
 
 
-    // ===============================================
-    // SAVE BOT REPLY
-    // ===============================================
+    // =================================================
+    // SAVE BOT MESSAGE
+    // =================================================
 
     conversation.messages.push({
 
-      sender: "bot",
+      sender:
+        "bot",
 
-      message: botReply
+      message:
+        botReply
 
     })
 
@@ -131,18 +252,18 @@ export const chat = async (req, res) => {
 
 
 
-    // ===============================================
-    // RESPONSE
-    // ===============================================
-
     return res.status(200).json({
 
       success: true,
 
-      reply: botReply,
+      reply:
+        botReply,
 
       conversationId:
-        conversation._id
+        conversation._id,
+
+      failedAttempts:
+        conversation.failedAttempts
 
     })
 
@@ -158,7 +279,8 @@ export const chat = async (req, res) => {
 
       success: false,
 
-      message: "Server Error"
+      message:
+        "Server Error"
 
     })
 

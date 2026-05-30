@@ -1,75 +1,51 @@
-import Knowledge from "../models/Knowledge.js";
+import Knowledge from "../models/Knowledge.js"
 
-
-
-// =====================================================
-// SEARCH KNOWLEDGE BASE
-// =====================================================
-
-export const searchKnowledgeBase = async ({
-
-  category,
-
-  conversation
-
-}) => {
+export const searchKnowledgeBase =
+async ({ issue }) => {
 
   try {
 
-    // ===============================================
-    // FETCH KNOWLEDGE DOC
-    // ===============================================
+    const words =
+      issue
+        .toLowerCase()
+        .split(" ")
 
     const knowledge =
       await Knowledge.findOne({
 
-        category,
+        keywords: {
+          $in: words
+        },
 
         isActive: true
 
-      });
-
-
+      })
 
     if (!knowledge) {
 
-      return null;
+      return null
 
     }
 
+    return `
+Title:
+${knowledge.title}
 
+Problem:
+${knowledge.problem}
 
-    // ===============================================
-    // LATER:
-    // LangChain / Vector Search Here
-    // ===============================================
-
-    /*
-    
-      Future Flow:
-      
-      conversation
-         ↓
-      embeddings
-         ↓
-      vector search
-         ↓
-      semantic retrieval
-    
-    */
-
-
-
-    return knowledge.solution;
+Solution:
+${knowledge.solution}
+`
 
   }
 
   catch (error) {
 
-    console.log(error);
+    console.log(error)
 
-    return null;
+    return null
 
   }
 
-};
+}

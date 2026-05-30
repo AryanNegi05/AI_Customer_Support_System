@@ -5,43 +5,40 @@ import {
   searchKnowledgeBase
 } from "../../services/knowledgeService.js"
 
+export const searchKnowledgeTool =
+tool(
 
-
-export const searchKnowledgeTool = tool(
-
-  async ({ category, issue }) => {
+  async ({ issue }) => {
 
     const result =
       await searchKnowledgeBase({
-
-        category,
 
         issue
 
       })
 
-
-
-    return result ||
-      "No solution found"
+    return (
+      result ||
+      "No matching solution found."
+    )
 
   },
 
   {
 
-    name: "search_knowledge_base",
+    name:
+      "search_knowledge_base",
 
     description:
-      `Search troubleshooting steps
-       for customer issues.`,
+      "Search support knowledge base.",
 
-    schema: z.object({
+    schema:
+      z.object({
 
-      category: z.string(),
+        issue:
+          z.string()
 
-      issue: z.string()
-
-    })
+      })
 
   }
 
