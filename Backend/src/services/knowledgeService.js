@@ -1,31 +1,19 @@
 import Knowledge from "../models/Knowledge.js"
 
-export const searchKnowledgeBase =
-async ({ issue }) => {
-
+export const searchKnowledgeBase = async ({ issue }) => {
   try {
+    const words = (issue.toLowerCase().match(/[a-z0-9]+/g) || []).filter(Boolean)
 
-    const words =
-      issue
-        .toLowerCase()
-        .split(" ")
+    const knowledge = await Knowledge.findOne({
+      isActive: true,
+      $or: [
+        { keywords: { $in: words } },
+        { title: { $regex: issue, $options: "i" } },
+        { problem: { $regex: issue, $options: "i" } }
+      ]
+    })
 
-    const knowledge =
-      await Knowledge.findOne({
-
-        keywords: {
-          $in: words
-        },
-
-        isActive: true
-
-      })
-
-    if (!knowledge) {
-
-      return null
-
-    }
+    if (!knowledge) return null
 
     return `
 Title:
@@ -36,16 +24,9 @@ ${knowledge.problem}
 
 Solution:
 ${knowledge.solution}
-`
-
-  }
-
-  catch (error) {
-
+`.trim()
+  } catch (error) {
     console.log(error)
-
     return null
-
   }
-
 }
