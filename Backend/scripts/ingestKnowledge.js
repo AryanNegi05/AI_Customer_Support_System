@@ -28,7 +28,7 @@ await mongoose.connect(
 
 const files =
   fs.readdirSync(
-    "./knowledge-base"
+    "./Knowledge-base"
   )
 
 await KnowledgeChunk.deleteMany()
@@ -37,7 +37,7 @@ for (const file of files) {
 
   const text =
     await loadPdf(
-      `./knowledge-base/${file}`
+      `./Knowledge-base/${file}`
     )
 
   const chunks =

@@ -4,7 +4,7 @@ import {
   decreaseAgentTickets
 } from "../services/redisAgentService.js"
 
-
+import Conversation from "../models/Conversation.js"
 
 // =====================================================
 // GET ASSIGNED TICKETS
@@ -235,7 +235,16 @@ export const updateTicketStatus =
         ticket.resolvedAt =
           new Date()
 
+         await Conversation.findByIdAndUpdate(
 
+    ticket.conversationId,
+
+    {
+      status: "resolved",
+      stage: "resolved"
+    }
+
+  )
 
         // REDIS WORKLOAD DECREASE
         await decreaseAgentTickets(
