@@ -1,17 +1,47 @@
 import { tool } from "@langchain/core/tools"
 import { z } from "zod"
-import { searchKnowledgeBase } from "../../services/knowledgeService.js"
 
-export const searchKnowledgeTool = tool(
+import {
+  searchKnowledge
+} from "../../services/vectorSearchService.js"
+
+export const searchKnowledgeTool =
+tool(
+
   async ({ issue }) => {
-    const result = await searchKnowledgeBase({ issue })
-    return result || "No matching solution found."
+
+    const docs =
+      await searchKnowledge(issue)
+
+    if (!docs.length) {
+
+      return "No relevant knowledge found."
+
+    }
+
+    return docs
+      .map(doc => doc.content)
+      .join("\n\n")
+
   },
+
   {
-    name: "search_knowledge_base",
-    description: "Search support knowledge base for troubleshooting steps.",
-    schema: z.object({
-      issue: z.string()
-    })
+
+    name:
+      "search_knowledge_base",
+
+    description:
+      `Search company support knowledge base
+       and return relevant troubleshooting information.`,
+
+    schema:
+      z.object({
+
+        issue:
+          z.string()
+
+      })
+
   }
+
 )

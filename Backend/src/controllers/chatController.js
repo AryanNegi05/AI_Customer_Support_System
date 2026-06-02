@@ -74,7 +74,7 @@ export const chat = async (req, res) => {
       canEscalate: escalation.escalate,
       hasTicket: !!conversation.ticketId
     })
-
+await conversation.save()
     conversation.messages.push({
       sender: "bot",
       message: botReply

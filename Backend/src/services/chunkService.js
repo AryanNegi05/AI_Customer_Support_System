@@ -1,7 +1,7 @@
 import {
   RecursiveCharacterTextSplitter
 }
-from "langchain/text_splitter"
+from "@langchain/textsplitters"
 
 export const splitText =
 async (text) => {
